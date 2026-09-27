@@ -19,23 +19,37 @@ public class TestBase {
         Configuration.browser = BrowserstackDriver.class.getName();
         Configuration.browserSize = null;
         Configuration.timeout = 30000;
+        Configuration.screenshots = false;
+        Configuration.savePageSource = false;
     }
 
     @BeforeEach
     void beforeEach() {
-        SelenideLogger.addListener("AllureSelenide", new AllureSelenide());
+        SelenideLogger.addListener(
+                "AllureSelenide",
+                new AllureSelenide().screenshots(false).savePageSource(false)
+        );
         open();
     }
 
     @AfterEach
     void addAttachments() {
-        String sessionId = Selenide.sessionId().toString();
-        System.out.println(sessionId);
+        String sessionId = null;
+        try {
+            sessionId = Selenide.sessionId().toString();
+            Attach.pageSource();
+        } catch (RuntimeException error) {
+            Attach.attachAsText("Ошибка получения вложений", error.toString());
+        } finally {
+            closeWebDriver();
+        }
 
-//        Attach.screenshotAs("Last screenshot"); // todo fix
-        Attach.pageSource();
-        closeWebDriver();
-
-        Attach.addVideo(sessionId);
+        if (sessionId != null) {
+            try {
+                Attach.addVideo(sessionId);
+            } catch (RuntimeException error) {
+                Attach.attachAsText("Ошибка получения видео", error.toString());
+            }
+        }
     }
 }
