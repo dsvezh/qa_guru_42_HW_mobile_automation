@@ -8,7 +8,8 @@ repositories {
 }
 
 def aspectjWeaverVersion = "1.9.22",
-    selenideVersion = "6.13.0",
+    selenideVersion = "7.16.2",
+    appiumVersion = "10.1.1",
     restAssuredVersion = "5.3.0",
     allureVersion = "2.33.0",
     junitVersion = "5.9.3",
@@ -34,7 +35,7 @@ dependencies {
             "org.aspectj:aspectjweaver:$aspectjWeaverVersion",
             "com.codeborne:selenide:$selenideVersion",
             "io.qameta.allure:allure-selenide:$allureVersion",
-            "io.appium:java-client:8.3.0",
+            "io.appium:java-client:$appiumVersion",
             "io.rest-assured:rest-assured:$restAssuredVersion",
             "org.aeonbits.owner:owner:$ownerVersion",
             "org.junit.jupiter:junit-jupiter:$junitVersion",
@@ -42,9 +43,14 @@ dependencies {
     )
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 tasks.withType(Test) {
     useJUnitPlatform()
     systemProperties(System.getProperties())
+    systemProperty 'file.encoding', 'UTF-8'
 
     testLogging {
         lifecycle {

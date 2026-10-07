@@ -4,6 +4,7 @@ import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import drivers.BrowserstackDriver;
+import drivers.DriverFactory;
 import helpers.Attach;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterEach;
@@ -16,7 +17,7 @@ import static com.codeborne.selenide.Selenide.open;
 public class TestBase {
     @BeforeAll
     static void beforeAll() {
-        Configuration.browser = BrowserstackDriver.class.getName();
+        Configuration.browser = DriverFactory.getDriverClass().getName();
         Configuration.browserSize = null;
         Configuration.timeout = 30000;
         Configuration.screenshots = false;
@@ -44,7 +45,7 @@ public class TestBase {
             closeWebDriver();
         }
 
-        if (sessionId != null) {
+        if (sessionId != null && BrowserstackDriver.class.getName().equals(Configuration.browser)) {
             try {
                 Attach.addVideo(sessionId);
             } catch (RuntimeException error) {
